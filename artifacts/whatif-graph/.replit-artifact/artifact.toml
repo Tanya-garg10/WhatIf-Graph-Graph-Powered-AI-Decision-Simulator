@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "WhatIf Graph"
+description = "An AI-powered decision simulator for software systems. Explore a dependency graph, test hypothetical incidents or changes, and compare baseline state with graph-derived downstream impact and mitigation advice."
+version = "1.0.0"
+id = "artifacts/whatif-graph"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22126
+
+[services.development]
+run = "pnpm --filter @workspace/whatif-graph run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/whatif-graph", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/whatif-graph/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22126"
+BASE_PATH = "/"

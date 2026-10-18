@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "export NODE_ENV=development && pnpm run build && pnpm run start",
+    "dev": "python -m uvicorn whatif.main:app --app-dir . --host 0.0.0.0 --port ${PORT:-8080}",
     "build": "node ./build.mjs",
-    "start": "node --enable-source-maps ./dist/index.mjs",
+    "start": "python -m uvicorn whatif.main:app --app-dir . --host 0.0.0.0 --port ${PORT:-8080}",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

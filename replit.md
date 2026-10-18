@@ -1,44 +1,54 @@
-# [Project name]
+# WhatIf Graph
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A graph-powered decision simulator that traces hypothetical software-system changes through downstream dependencies.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the FastAPI service (port 8080)
+- `pnpm --filter @workspace/whatif-graph run dev` — run the React/Vite frontend
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `PYTHONPATH=artifacts/api-server python -m unittest discover -s artifacts/api-server/tests -v` — run graph simulation unit tests
+- Optional env: `FALKORDB_URI` or `FALKORDB_HOST` plus connection settings; without either, the API reports local demo mode
+- Optional secret: `OPENAI_API_KEY` for AI-assisted scenario interpretation
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
+- Frontend: React, Vite, Tailwind CSS
+- API: Python 3.11 + FastAPI
+- Graph: FalkorDB + official Python client; local in-memory fallback when no database is configured
 - Validation: Zod (`zod/v4`), `drizzle-zod`
 - API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Optional AI parsing: official OpenAI Python SDK using `OPENAI_API_KEY`
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/whatif-graph/` — dashboard and dependency-graph visualization
+- `artifacts/api-server/whatif/` — FastAPI service, graph store, and simulator
+- `artifacts/api-server/tests/` — local simulation tests
+- `lib/api-spec/openapi.yaml` — API contract
+- `README.md` — setup, environment, graph model, and example Cypher
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Simulations only read the baseline graph; graph-derived findings and heuristic mitigations stay distinct.
+- FalkorDB is selected when a URI or host is configured. Missing configuration activates clearly labeled demo mode; a failed configured connection returns an error rather than silently falling back.
+- The sample graph is seeded only when the connected graph has no `:Component` nodes.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Users inspect connections, run suggested what-if scenarios or enter their own, and review affected paths, severity, bottlenecks, and mitigations.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- The user requested a premium responsive dark dashboard with violet/blue accents and a complete, runnable hackathon project.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- The API service uses Python from the Replit-managed environment; local setup also needs `artifacts/api-server/requirements.txt`.
+- Keep API request and response shapes in `lib/api-spec/openapi.yaml`; rerun codegen after changes.
 
 ## Pointers
 

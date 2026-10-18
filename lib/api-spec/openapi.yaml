@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: whatif
+    description: Dependency graph and scenario simulation
 paths:
   /healthz:
     get:
@@ -24,6 +26,40 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /graph:
+    get:
+      operationId: getDependencyGraph
+      tags: [whatif]
+      summary: Get the baseline dependency graph
+      description: Returns the e-commerce demo graph and whether it is backed by FalkorDB or local demo mode.
+      responses:
+        "200":
+          description: Baseline graph and connection status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GraphResponse"
+  /simulate:
+    post:
+      operationId: simulateScenario
+      tags: [whatif]
+      summary: Simulate a hypothetical system change
+      description: Traverses the baseline graph without mutating it and returns graph-derived impact facts and separately labeled heuristic mitigations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScenarioInput"
+      responses:
+        "200":
+          description: Impact report for the hypothetical scenario
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimulationResponse"
+        "400":
+          description: Invalid or unrecognized scenario
 components:
   schemas:
     HealthStatus:
@@ -33,4 +69,98 @@ components:
           type: string
       required:
         - status
+    GraphNode:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        type: { type: string }
+        description: { type: string }
+        status: { type: string }
+      required: [id, name, type, description, status]
+    GraphEdge:
+      type: object
+      properties:
+        source: { type: string }
+        target: { type: string }
+        relationship: { type: string }
+      required: [source, target, relationship]
+    GraphResponse:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items: { $ref: "#/components/schemas/GraphNode" }
+        edges:
+          type: array
+          items: { $ref: "#/components/schemas/GraphEdge" }
+        backend:
+          type: string
+          enum: [falkordb, demo]
+        databaseConnected: { type: boolean }
+        aiConfigured: { type: boolean }
+        graphName: { type: string }
+      required: [nodes, edges, backend, databaseConnected, aiConfigured, graphName]
+    ScenarioInput:
+      type: object
+      properties:
+        scenario:
+          type: string
+          minLength: 5
+          maxLength: 500
+      required: [scenario]
+    ImpactNode:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        type: { type: string }
+        severity:
+          type: string
+          enum: [critical, high, medium, low]
+        reason: { type: string }
+        path:
+          type: array
+          items: { type: string }
+      required: [id, name, type, severity, reason, path]
+    Mitigation:
+      type: object
+      properties:
+        title: { type: string }
+        detail: { type: string }
+        basis:
+          type: string
+          enum: [heuristic]
+      required: [title, detail, basis]
+    SimulationResponse:
+      type: object
+      properties:
+        scenario: { type: string }
+        triggerNode: { type: string }
+        eventType:
+          type: string
+          enum: [outage, delay, capacity_loss]
+        risk:
+          type: string
+          enum: [critical, high, moderate, low]
+        baselineComponentCount: { type: integer }
+        affectedComponentCount: { type: integer }
+        affectedNodes:
+          type: array
+          items: { $ref: "#/components/schemas/ImpactNode" }
+        bottlenecks:
+          type: array
+          items: { type: string }
+        mitigations:
+          type: array
+          items: { $ref: "#/components/schemas/Mitigation" }
+        explanation: { type: string }
+        backend:
+          type: string
+          enum: [falkordb, demo]
+        databaseConnected: { type: boolean }
+        analysisMode:
+          type: string
+          enum: [ai_assisted, rule_based]
+      required: [scenario, triggerNode, eventType, risk, baselineComponentCount, affectedComponentCount, affectedNodes, bottlenecks, mitigations, explanation, backend, databaseConnected, analysisMode]
 

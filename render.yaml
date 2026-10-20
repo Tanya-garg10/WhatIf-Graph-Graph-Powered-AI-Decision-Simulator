@@ -1,0 +1,41 @@
+services:
+  # Backend API Service
+  - type: web
+    name: whatif-graph-api
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python src/main.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: PORT
+        value: 8888
+      - key: FALKORDB_HOST
+        sync: false
+      - key: FALKORDB_PORT
+        sync: false
+      - key: FALKORDB_USERNAME
+        sync: false
+      - key: FALKORDB_PASSWORD
+        sync: false
+      - key: FALKORDB_SSL
+        value: "false"
+      - key: FALKORDB_GRAPH_NAME
+        value: whatif_graph
+    region: oregon
+    rootDirectory: artifacts/api-server
+
+  # Frontend Static Site
+  - type: web
+    name: whatif-graph-frontend
+    env: static
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist/public
+    envVars:
+      - key: VITE_API_URL
+        value: https://whatif-graph-api.onrender.com/api
+        sync: false
+    region: oregon
+    rootDirectory: artifacts/whatif-graph

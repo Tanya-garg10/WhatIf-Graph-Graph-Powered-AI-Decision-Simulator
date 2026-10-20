@@ -8,11 +8,65 @@ This guide covers deploying the WhatIf Graph application to production.
 - **Backend**: Python FastAPI with FalkorDB
 - **Database**: FalkorDB Cloud
 
+## Pre-Deployment Setup
+
+The frontend has been modified to work with Render by:
+- Removing Replit-specific monorepo dependencies (`catalog:` protocol)
+- Copying the `api-client-react` library into the frontend source
+- Creating a standalone `package.json` with explicit versions
+- Removing Replit-specific Vite plugins
+- Configuring Tailwind CSS v3 for production builds
+
+**Important**: The frontend now includes a copy of the API client library in `src/lib/api-client-react/`. If you update the API spec, you'll need to regenerate this file and copy it to this location.
+
 ## Deployment Options
 
 ### Option 1: Render (Recommended - Free tier available)
 
-#### Deploy Backend (Render)
+#### Option 1A: Using render.yaml (Automated - Recommended)
+
+A `render.yaml` configuration file has been created in the project root for easy deployment.
+
+**Prerequisites:**
+- Push your code to GitHub
+- Create a Render account at [render.com](https://render.com)
+
+**Steps:**
+
+1. Push your code to GitHub (ensure `render.yaml` is committed)
+2. Go to [render.com](https://render.com) and sign up
+3. Click "New +" → "Blueprint" (New Experience)
+4. Connect your GitHub repository
+5. Render will automatically detect the `render.yaml` file
+6. Review the configuration and click "Apply Blueprint"
+7. Render will create both services:
+   - `whatif-graph-api` (Backend)
+   - `whatif-graph-frontend` (Frontend)
+
+**Environment Variables to Set in Render Dashboard:**
+
+For the backend service (`whatif-graph-api`):
+```
+FALKORDB_HOST=r-6jissuruar.instance-keqdkat0a.hc-7up0crkyn.ap-south-1.aws.f2e0a955bb84.cloud
+FALKORDB_PORT=65332
+FALKORDB_USERNAME=falkordb
+FALKORDB_PASSWORD=whatif-graph-001
+FALKORDB_SSL=false
+FALKORDB_GRAPH_NAME=whatif_graph
+```
+
+For the frontend service (`whatif-graph-frontend`):
+```
+VITE_API_URL=https://whatif-graph-api.onrender.com/api
+```
+
+After deployment, you can access:
+- Backend API: `https://whatif-graph-api.onrender.com`
+- Frontend: `https://whatif-graph-frontend.onrender.com`
+
+#### Option 1B: Manual Deployment
+
+**Deploy Backend (Render):**
 
 1. Push your code to GitHub
 2. Go to [render.com](https://render.com) and sign up
@@ -36,7 +90,50 @@ This guide covers deploying the WhatIf Graph application to production.
 7. Click "Deploy Web Service"
 8. Copy the deployed URL (e.g., `https://whatif-graph-api.onrender.com`)
 
-#### Deploy Frontend (Vercel)
+**Deploy Frontend (Render):**
+
+1. Click "New +" → "Web Service"
+2. Connect your GitHub repository
+3. Configure:
+   - **Name**: whatif-graph-frontend
+   - **Environment**: Static Site
+   - **Root Directory**: `artifacts/whatif-graph`
+   - **Build Command**: `npm install --legacy-peer-deps && npm run build`
+   - **Publish Directory**: `dist/public`
+4. Add Environment Variable:
+   ```
+   VITE_API_URL=https://whatif-graph-api.onrender.com/api
+   ```
+5. Click "Deploy Web Service"
+6. Your frontend will be live on Render
+
+#### Option 1C: Backend on Render, Frontend on Vercel
+
+**Deploy Backend (Render):**
+
+1. Push your code to GitHub
+2. Go to [render.com](https://render.com) and sign up
+3. Click "New +" → "Web Service"
+4. Connect your GitHub repository
+5. Configure:
+   - **Name**: whatif-graph-api
+   - **Root Directory**: `artifacts/api-server`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `python src/main.py`
+   - **Python Version**: 3.11
+6. Add Environment Variables:
+   ```
+   FALKORDB_HOST=r-6jissuruar.instance-keqdkat0a.hc-7up0crkyn.ap-south-1.aws.f2e0a955bb84.cloud
+   FALKORDB_PORT=65332
+   FALKORDB_USERNAME=falkordb
+   FALKORDB_PASSWORD=whatif-graph-001
+   FALKORDB_SSL=false
+   FALKORDB_GRAPH_NAME=whatif_graph
+   ```
+7. Click "Deploy Web Service"
+8. Copy the deployed URL (e.g., `https://whatif-graph-api.onrender.com`)
+
+**Deploy Frontend (Vercel):**
 
 1. Go to [vercel.com](https://vercel.com) and sign up
 2. Click "Add New Project"
@@ -44,8 +141,8 @@ This guide covers deploying the WhatIf Graph application to production.
 4. Configure:
    - **Framework Preset**: Vite
    - **Root Directory**: `artifacts/whatif-graph`
-   - **Build Command**: `pnpm run build`
-   - **Output Directory**: `dist`
+   - **Build Command**: `npm install --legacy-peer-deps && npm run build`
+   - **Output Directory**: `dist/public`
 5. Add Environment Variable:
    ```
    VITE_API_URL=https://whatif-graph-api.onrender.com/api

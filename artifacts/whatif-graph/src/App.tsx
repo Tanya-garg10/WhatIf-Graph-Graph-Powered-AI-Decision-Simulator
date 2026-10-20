@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useGetDependencyGraph, useSimulateScenario, getGetDependencyGraphQueryKey } from '@workspace/api-client-react';
+import { useGetDependencyGraph, useSimulateScenario, getGetDependencyGraphQueryKey } from './lib/api-client-react';
 import { Activity, AlertTriangle, ArrowRight, Boxes, Braces, ChevronRight, CircleDot, Cloud, Database, GitBranch, LoaderCircle, Network, Play, RefreshCw, Server, Sparkles, Waypoints } from 'lucide-react';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';

@@ -96,10 +96,10 @@ After deployment, you can access:
 2. Connect your GitHub repository
 3. Configure:
    - **Name**: whatif-graph-frontend
-   - **Environment**: Static Site
+   - **Environment**: Node
    - **Root Directory**: `artifacts/whatif-graph`
-   - **Build Command**: `npm install --legacy-peer-deps && npm run build`
-   - **Publish Directory**: `dist/public`
+   - **Build Command**: `npm install && npm run build`
+   - **Start Command**: `serve -s dist/public -l 3000`
 4. Add Environment Variable:
    ```
    VITE_API_URL=https://whatif-graph-api.onrender.com/api

@@ -29,10 +29,10 @@ services:
   # Frontend Static Site
   - type: web
     name: whatif-graph-frontend
-    env: static
+    env: node
     plan: free
     buildCommand: npm install && npm run build
-    staticPublishPath: dist/public
+    startCommand: serve -s dist/public -l 3000
     envVars:
       - key: VITE_API_URL
         value: https://whatif-graph-api.onrender.com/api

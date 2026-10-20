@@ -32,7 +32,7 @@ services:
     env: node
     plan: free
     buildCommand: npm install && npm run build
-    startCommand: serve -s dist/public -l 3000
+    startCommand: node server.js
     envVars:
       - key: VITE_API_URL
         value: https://whatif-graph-api.onrender.com/api

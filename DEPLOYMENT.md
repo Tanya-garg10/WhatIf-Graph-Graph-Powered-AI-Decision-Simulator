@@ -99,7 +99,7 @@ After deployment, you can access:
    - **Environment**: Node
    - **Root Directory**: `artifacts/whatif-graph`
    - **Build Command**: `npm install && npm run build`
-   - **Start Command**: `serve -s dist/public -l 3000`
+   - **Start Command**: `node server.js`
 4. Add Environment Variable:
    ```
    VITE_API_URL=https://whatif-graph-api.onrender.com/api

@@ -55,7 +55,7 @@ FALKORDB_SSL=false
 FALKORDB_GRAPH_NAME=whatif_graph
 ```
 
-For the frontend service (`whatif-graph-frontend`):
+For the frontend service (`whatif-graph-app`):
 ```
 VITE_API_URL=https://whatif-graph-api.onrender.com/api
 ```
@@ -95,7 +95,7 @@ After deployment, you can access:
 1. Click "New +" → "Web Service"
 2. Connect your GitHub repository
 3. Configure:
-   - **Name**: whatif-graph-frontend
+   - **Name**: whatif-graph-app
    - **Environment**: Node
    - **Root Directory**: `artifacts/whatif-graph`
    - **Build Command**: `npm install && npm run build`

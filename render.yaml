@@ -28,7 +28,7 @@ services:
 
   # Frontend Static Site
   - type: web
-    name: whatif-graph-frontend
+    name: whatif-graph-app
     env: node
     plan: free
     buildCommand: npm install && npm run build
